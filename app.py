@@ -19,7 +19,7 @@ if uploaded_file is not None:
     st.info("⏳ Transcribing using Whisper Medium... please wait, this may take a while for long audios.")
 
     # Load Whisper medium model (high accuracy, ~769MB in size)
-    model = whisper.load_model("medium")
+    model = whisper.load_model("small")
 
     # Transcribe full audio file
     result = model.transcribe(tmp_path, fp16=False)
