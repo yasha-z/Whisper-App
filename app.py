@@ -4,33 +4,34 @@ import tempfile
 import os
 
 st.title("Whisper Audio Transcription App 🎤")
-st.write("Upload a long audio file (MP3, WAV, M4A, OGG, etc.) and get an accurate transcript.")
+st.write("Upload a long audio file (MP3, MPEG, WAV, M4A, OGG, etc.) and get an accurate transcript.")
 
-# File uploader
-uploaded_file = st.file_uploader("Choose an audio file", type=["mp3", "wav", "ogg", "m4a"])
+# File uploader (added "mpeg")
+uploaded_file = st.file_uploader("Choose an audio file", type=["mp3", "mpeg", "wav", "ogg", "m4a"])
 
 if uploaded_file is not None:
-    # Save uploaded file to a temp file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+    # Preserve file extension for compatibility
+    suffix = "." + uploaded_file.name.split(".")[-1]
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(uploaded_file.read())
         tmp_path = tmp.name
 
-    st.info("Transcribing... this may take a while depending on audio length.")
+    st.info("⏳ Transcribing... please wait, this may take a while depending on audio length.")
 
-    # Load Whisper model (choose according to accuracy vs speed)
-    # Options: tiny, base, small, medium, large
-    model = whisper.load_model("base")  # change to "small" or "medium" if needed
+    # Load Whisper small model (good accuracy)
+    model = whisper.load_model("small")
 
-    # Transcribe audio
+    # Transcribe full audio
     result = model.transcribe(tmp_path, fp16=False)
 
     # Delete temp file
     os.remove(tmp_path)
 
-    # Show transcript
+    # Final transcript
     final_text = result["text"]
+
     st.subheader("Transcript:")
     st.text_area("Transcription", final_text, height=400)
 
-    # Download button
+    # Download option
     st.download_button("Download Transcript", final_text, file_name="transcript.txt")
